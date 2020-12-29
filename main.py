@@ -4,23 +4,18 @@
 from skimage.metrics import structural_similarity as ssim
 import cv2
 
-def mse(imageA, imageB):
-    # the 'Mean Squared Error' between the two images is the
-    # sum of the squared difference between the two images;
-    # NOTE: the two images must have the same dimension
-    err = np.sum((imageA.astype("float") - imageB.astype("float")) ** 2)
-    err /= float(imageA.shape[0] * imageA.shape[1])
+def compare_images(img1, img2):
+    if check_size_equal(img1, img2):
+        print ("Image sizes are equal")
+        return ssim(img1, img2, multichannel=True)
+    else:
+        print ("Image sizes are not equal")
+    if has_scale_factor(img1, img2):
+        scale_factor = find_scale_factor(img1, img2)
+        return (f"Image 1 is {scale_factor}x the size of Image 2")
+    else:
+        return ("Images have no scale factor")
 
-    # return the MSE, the lower the error, the more "similar"
-    # the two images are
-    return err
-
-def compare_images(imageA, imageB):
-    # compute the mean squared error and structural similarity
-    # index for the images
-    m = mse(imageA, imageB)
-    s = ssim(imageA, imageB)
-    return (f"{m},{s}")
 
 def check_size_equal(img1, img2):
     height_check = img1.shape[0] == img2.shape[0]
@@ -76,16 +71,20 @@ print (find_scale_factor(formi1, formi2))
 # other = cv2.cvtColor(other, cv2.COLOR_BGR2GRAY)
 
 # compare the images
-# print ("Comparing Prinz Set 1")
-# print ("Comparing Prinz 1 with Prinz 1", ssim(prinz11, prinz11, multichannel=True))
-# print ("Comparing Prinz 1 with Prinz 2", ssim(prinz11, prinz12, multichannel=True))
-# print ("Comparing Prinz 1 with Prinz 3", ssim(prinz12, prinz13, multichannel=True))
-#
-# print ("Comparing Prinz Set 2")
-# print ("Comparing Prinz 1 with Prinz 1", ssim(prinz21, prinz21, multichannel=True))
-# print ("Comparing Prinz 1 with Prinz 2", ssim(prinz21, prinz22, multichannel=True))
+print ("Comparing Prinz Set 1")
+print ("Comparing Prinz 1 with Prinz 1", compare_images(prinz11, prinz11))
+print ("Comparing Prinz 1 with Prinz 2", compare_images(prinz11, prinz12))
+print ("Comparing Prinz 1 with Prinz 3", compare_images(prinz12, prinz13))
 
-#NOTE: multichannel mkaes it take three times as long
+print ("Comparing Prinz Set 2")
+print ("Comparing Prinz 1 with Prinz 1", compare_images(prinz21, prinz21))
+print ("Comparing Prinz 1 with Prinz 2", compare_images(prinz21, prinz22))
+
+#NOTE: multichannel mkaes it take three times as long as grayscale
 
 # # throws error since dimensions don't match
-# print ("Comparing original with completely different image", compare_images(original, other))
+print ("Comparing Prinz Set1, Pic 1 with Lusty 1", compare_images(prinz11, lusty1))
+
+print("Comparing Brem Set: ", compare_images(brem1, brem2))
+
+print("Comparing Formi Set: ", compare_images(formi1, formi2))
