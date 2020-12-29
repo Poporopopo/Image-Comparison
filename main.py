@@ -12,7 +12,14 @@ def compare_images(img1, img2):
         print ("Image sizes are not equal")
     if has_scale_factor(img1, img2):
         scale_factor = find_scale_factor(img1, img2)
-        return (f"Image 1 is {scale_factor}x the size of Image 2")
+        print (f"Image 1 is {scale_factor}x the size of Image 2")
+
+        larger_image = find_larger_image(img1, img2)
+        smaller_image = find_smaller_image(img1, img2)
+        smaller_image = cv2.resize(smaller_image, (larger_image.shape[1], larger_image.shape[0]), interpolation = cv2.INTER_AREA)
+        size_check = check_size_equal(larger_image, smaller_image)
+        print ("Resized image dimensions are now equal to larger image: ", size_check)
+        return ssim(larger_image, smaller_image, multichannel=True)
     else:
         return ("Images have no scale factor")
 
@@ -27,8 +34,21 @@ def has_scale_factor(img1, img2):
     width_ratio = float(img1.shape[1])/img2.shape[1]
     return height_ratio/width_ratio == 1.0
 
+# deprecated
 def find_scale_factor(img1, img2):
     return float(img1.shape[0])/img2.shape[0]
+
+def find_larger_image(img1, img2):
+    if float(img1.shape[0])/img2.shape[0] > 1.0:
+        return img1
+    else:
+        return img2
+
+def find_smaller_image(img1, img2):
+    if float(img1.shape[0])/img2.shape[0] < 1.0:
+        return img1
+    else:
+        return img2
 
 # load the images -- the original, the original + contrast,
 # and the original + photoshop
